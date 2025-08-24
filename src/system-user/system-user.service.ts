@@ -56,6 +56,7 @@ export class SystemUserService {
       name: user.name,
       email: user.email,
       role: user.role,
+      schoolId: 'classut',
     };
     const accessToken = this.jwtService.sign(payload);
     return { ...rest, access_token: accessToken };

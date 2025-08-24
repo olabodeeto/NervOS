@@ -7,6 +7,7 @@ import * as jwt from 'jsonwebtoken';
 export class SuperAdminMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction) {
     const authHeader = req.headers['authorization'];
+
     if (!authHeader) throw new ForbiddenException('No token provided');
 
     const token = authHeader.split(' ')[1];

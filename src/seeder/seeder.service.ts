@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { BcryptService } from 'src/auth/bcrypt.service';
+import { AllPermissions } from 'src/utils/permissions.utils';
 
 @Injectable()
 export class SeederService {
@@ -37,6 +38,16 @@ export class SeederService {
       });
 
       console.log('✅ Super Admin user created');
+
+      await this.prisma.role.upsert({
+        where: { name_schoolId: { name: 'admin', schoolId: 'classut' } },
+        update: { permissions: JSON.stringify({ ...AllPermissions }) },
+        create: {
+          name: 'admin',
+          schoolId: 'classut',
+          permissions: JSON.stringify({ ...AllPermissions }),
+        },
+      });
     } else {
       console.log('ℹ️ Super Admin already exists');
     }

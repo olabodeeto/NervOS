@@ -11,4 +11,16 @@ export class RoleService {
     });
     return role;
   }
+
+  async createRole(name: string, permissions: string, schoolId: string) {
+    await this.prisma.role.upsert({
+      where: { name_schoolId: { name, schoolId } },
+      update: { permissions },
+      create: {
+        name,
+        schoolId,
+        permissions,
+      },
+    });
+  }
 }

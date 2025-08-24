@@ -33,6 +33,7 @@ model Role {
   User        User[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  School      School[]
 
   @@unique([name, schoolId])
 }
@@ -63,6 +64,8 @@ model School {
   currentTermId    String?
   userType         UserType @default(SCHOOL)
 
+  roleId         String
+  role           Role             @relation(fields: [roleId], references: [id])
   currentSession AcademicSession? @relation("SchoolCurrentSession", fields: [currentSessionId], references: [id])
   currentTerm    Term?            @relation("SchoolCurrentTerm", fields: [currentTermId], references: [id])
 
