@@ -11,6 +11,11 @@ export class SeederService {
   ) {}
 
   async seed() {
+    const plans = [
+      { name: 'Freemium', duration: 1, price: 0 },
+      { name: 'Basic', duration: 6, price: 99.99 },
+      { name: 'Premium', duration: 12, price: 199.99 },
+    ];
     const existingUser = await this.prisma.user.findFirst({
       where: { email: 'super@classut.com' },
     });
@@ -37,8 +42,6 @@ export class SeederService {
         },
       });
 
-      console.log('✅ Super Admin user created');
-
       await this.prisma.role.upsert({
         where: { name_schoolId: { name: 'admin', schoolId: 'classut' } },
         update: { permissions: JSON.stringify({ ...AllPermissions }) },
@@ -48,6 +51,21 @@ export class SeederService {
           permissions: JSON.stringify({ ...AllPermissions }),
         },
       });
+
+      for (const plan of plans) {
+        await this.prisma.subscription.upsert({
+          where: { name: plan.name },
+          update: { price: plan.price, duration: plan.duration },
+          create: {
+            name: plan.name,
+            duration: plan.duration,
+            price: plan.price,
+            status: true,
+          },
+        });
+      }
+
+      console.log('✅ Subscription plans with prices seeded successfully');
     } else {
       console.log('ℹ️ Super Admin already exists');
     }

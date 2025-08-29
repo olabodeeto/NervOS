@@ -51,6 +51,26 @@ model Event {
   updatedAt   DateTime @updatedAt
 }
 
+model Subscription {
+  id                  String               @id @default(uuid())
+  name                String               @unique
+  status              Boolean              @default(true)
+  duration            Int // duration in months
+  price               Float                @default(0.0)
+  SchoolSubscriptions SchoolSubscription[]
+}
+
+model SchoolSubscription {
+  id             String       @id @default(uuid())
+  schoolId       String
+  startDate      DateTime     @default(now())
+  endDate        DateTime
+  isActive       Boolean      @default(true)
+  school         School       @relation(fields: [schoolId], references: [id])
+  subscriptionId String
+  subscription   Subscription @relation(fields: [subscriptionId], references: [id])
+}
+
 model School {
   id               String   @id @default(uuid())
   name             String
@@ -64,8 +84,9 @@ model School {
   currentTermId    String?
   userType         UserType @default(SCHOOL)
 
-  roleId         String
-  role           Role             @relation(fields: [roleId], references: [id])
+  roleId String
+  role   Role   @relation(fields: [roleId], references: [id])
+
   currentSession AcademicSession? @relation("SchoolCurrentSession", fields: [currentSessionId], references: [id])
   currentTerm    Term?            @relation("SchoolCurrentTerm", fields: [currentTermId], references: [id])
 
@@ -103,6 +124,7 @@ model School {
   Announcement         Announcement[]
   Message              Message[]
   Notification         Notification[]
+  SchoolSubscription   SchoolSubscription[]
 }
 
 model AcademicSession {
