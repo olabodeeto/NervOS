@@ -24,7 +24,10 @@ export class StaffRepository {
     });
   }
   async findByEmail(email: string) {
-    return this.database.staff.findFirst({ where: { email } });
+    return this.database.staff.findFirst({
+      where: { email },
+      include: { role: true },
+    });
   }
   async updateAccount() {}
   async deactivateAccount() {}

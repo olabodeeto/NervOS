@@ -12,4 +12,9 @@ export class StaffController {
   async createSchool(@Body() data: CreateStaffDto, @Request() req) {
     return await this.staffService.createStaff(data, req.user.schoolId);
   }
+
+  @Post('login')
+  async loginStaff(@Body() data: any) {
+    return this.staffService.staffLogin(data);
+  }
 }

@@ -11,6 +11,17 @@ import { UtilsService } from 'src/utils/utils.service';
 import { CreateSchoolDto } from './dto/school.dto';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/prisma/prisma.service';
+import {
+  AnnoucementPerm,
+  FileStoragePerm,
+  GuardianPerm,
+  InventoryPerm,
+  MessagePerm,
+  SchoolClassPerm,
+  StaffPerm,
+  StudentPerm,
+  TeacherPerm,
+} from 'src/utils/permissions.utils';
 
 @Injectable()
 export class SchoolService {
@@ -50,6 +61,48 @@ export class SchoolService {
     if (!subscription) {
       throw new Error('Freemium subscription plan not found');
     }
+
+    await this.prismaService.role.upsert({
+      where: { name_schoolId: { name: 'staff', schoolId: newSchool.id } },
+      update: {},
+      create: {
+        name: 'staff',
+        schoolId: newSchool.id,
+        permissions: JSON.stringify([
+          ...StaffPerm,
+          ...TeacherPerm,
+          ...StudentPerm,
+          ...GuardianPerm,
+          ...SchoolClassPerm,
+          ...FileStoragePerm,
+          ...InventoryPerm,
+          ...AnnoucementPerm,
+          ...MessagePerm,
+          'STAFF',
+        ]),
+      },
+    });
+
+    await this.prismaService.role.upsert({
+      where: { name_schoolId: { name: 'teacher', schoolId: newSchool.id } },
+      update: {},
+      create: {
+        name: 'teacher',
+        schoolId: newSchool.id,
+        permissions: JSON.stringify([
+          ...StaffPerm,
+          ...TeacherPerm,
+          ...StudentPerm,
+          ...GuardianPerm,
+          ...SchoolClassPerm,
+          ...FileStoragePerm,
+          ...InventoryPerm,
+          ...AnnoucementPerm,
+          ...MessagePerm,
+          'TEACHER',
+        ]),
+      },
+    });
     //create subscription for school
     await this.repo.createSchoolSubs(
       newSchool.id,

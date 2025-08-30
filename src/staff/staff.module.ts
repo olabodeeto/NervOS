@@ -7,9 +7,19 @@ import { AdminMiddleware } from 'src/middleware/admin.middleware';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { AuthModule } from 'src/auth/auth.module';
 import { UtilsModule } from 'src/utils/utils.module';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
-  imports: [PrismaModule, AuthModule, UtilsModule],
+  imports: [
+    PrismaModule,
+    AuthModule,
+    UtilsModule,
+    JwtModule.register({
+      secret: process.env.JWT_SECRET,
+      global: true,
+      signOptions: { expiresIn: '8h' },
+    }),
+  ],
   providers: [StaffService, StaffRepository],
   controllers: [StaffController],
 })
