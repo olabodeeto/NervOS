@@ -50,6 +50,7 @@ export class SchoolService {
     if (!subscription) {
       throw new Error('Freemium subscription plan not found');
     }
+    //create subscription for school
     await this.repo.createSchoolSubs(
       newSchool.id,
       subscription.id,
