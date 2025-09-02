@@ -25,6 +25,7 @@ import { AdminAuthModule } from './admin-auth/admin-auth.module';
 import { SystemUserModule } from './system-user/system-user.module';
 import { ConfigModule } from '@nestjs/config';
 import { UtilsModule } from './utils/utils.module';
+import { CommonModule } from './common/common.module';
 
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import { UtilsModule } from './utils/utils.module';
       isGlobal: true,
     }),
     UtilsModule,
+    CommonModule,
   ],
   controllers: [AppController],
   providers: [AppService],

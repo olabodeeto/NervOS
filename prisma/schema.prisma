@@ -125,6 +125,7 @@ model School {
   Message              Message[]
   Notification         Notification[]
   SchoolSubscription   SchoolSubscription[]
+  PortalUser           PortalUser[]
 }
 
 model AcademicSession {
@@ -189,21 +190,22 @@ model Term {
 }
 
 model Staff {
-  id          String       @id @default(uuid())
-  firstName   String
-  lastName    String
-  email       String       @unique
-  phone       String       @unique
-  photo       String
-  password    String
-  roleId      String?
-  staffCode   String       @unique
-  isActive    Boolean      @default(true)
-  documents   String       @db.Text
-  address     String
-  schoolId    String
+  id        String  @id @default(uuid())
+  firstName String
+  lastName  String
+  email     String  @unique
+  phone     String  @unique
+  photo     String
+  password  String
+  roleId    String?
+  staffCode String  @unique
+  isActive  Boolean @default(true)
+  documents String  @db.Text
+  address   String
+
   userType    UserType     @default(STAFF)
   staffType   String
+  schoolId    String
   school      School       @relation(fields: [schoolId], references: [id])
   role        Role?        @relation(fields: [roleId], references: [id])
   permissions Permission[]
@@ -551,11 +553,13 @@ model LessonAttendance {
 model PortalUser {
   id           String     @id @default(uuid())
   portUserType String
-  userType     UserType?
+  userType     UserType
   email        String     @unique
   password     String
   Student      Student[]
   Guardian     Guardian[]
+  schoolId     String
+  school       School     @relation(fields: [schoolId], references: [id])
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
 }
@@ -603,6 +607,7 @@ model Guardian {
   id           String     @id @default(uuid())
   portalUserId String
   portalUser   PortalUser @relation(fields: [portalUserId], references: [id])
+  userType     String
   name         String
   contact      String
   students     Student[]
@@ -815,6 +820,7 @@ enum UserType {
   STUDENT
   PARENT
   SCHOOL
+  USER
 }
 
 enum NotificationType {

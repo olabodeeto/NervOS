@@ -20,6 +20,7 @@ export class StaffRepository {
         staffCode: data.staffCode,
         address: data.address,
         schoolId: data.schoolId,
+        isAcademic: data.staffType === 'ACADEMIC' ? true : false,
       },
     });
   }
