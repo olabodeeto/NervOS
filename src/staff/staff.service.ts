@@ -1,5 +1,6 @@
 import {
   BadGatewayException,
+  BadRequestException,
   ForbiddenException,
   Injectable,
   UnauthorizedException,
@@ -22,8 +23,11 @@ export class StaffService {
   //create staff
   async createStaff(data: any, schoolId: string) {
     const hash = await this.Bcrypt.hash(data.password);
+    const staffRole = await this.repo.getStaffRole();
+    if (!staffRole) throw new BadRequestException('Staff role not found');
     const payload: ICreateStaff = {
       ...data,
+      roleId: staffRole.id,
       password: hash,
       documents: JSON.stringify(data.documents),
       staffCode: await this.utils.generateStaffCode(),
@@ -45,8 +49,10 @@ export class StaffService {
     return staff;
   };
 
+  // Staff login
   async staffLogin(data: { email: string; password: string }) {
     const staff = await this.validate(data);
+    console.log('staff', staff);
     const { password, ...rest } = staff;
     const payload = {
       sub: staff.id,
@@ -60,5 +66,12 @@ export class StaffService {
 
     const accessToken = this.jwtService.sign(payload);
     return { ...rest, access_token: accessToken };
+  }
+
+  // Get staff by id
+  async getStaff(id: string) {
+    const staff = await this.repo.findByID(id);
+    if (!staff) throw new BadRequestException('Staff not found!');
+    return { ...staff };
   }
 }

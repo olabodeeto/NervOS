@@ -10,4 +10,6 @@ export interface ICreateStaff {
   photo: string;
   schoolId: string;
   staffCode: any;
+  roleId: string;
+  role: any;
 }

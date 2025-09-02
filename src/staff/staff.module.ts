@@ -8,6 +8,7 @@ import { PrismaModule } from 'src/prisma/prisma.module';
 import { AuthModule } from 'src/auth/auth.module';
 import { UtilsModule } from 'src/utils/utils.module';
 import { JwtModule } from '@nestjs/jwt';
+import { SchoolMiddleware } from 'src/middleware/school.middleware';
 
 @Module({
   imports: [
@@ -32,5 +33,10 @@ export class StaffModule {
         { path: '/staff/:id', method: RequestMethod.GET },
       )
       .forRoutes({ path: '/staff', method: RequestMethod.POST });
+
+    consumer
+      .apply(SchoolMiddleware)
+      .exclude({ path: '/staff/login', method: RequestMethod.POST })
+      .forRoutes({ path: '/staff/:id', method: RequestMethod.GET });
   }
 }

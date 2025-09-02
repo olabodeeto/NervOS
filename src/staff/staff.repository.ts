@@ -21,6 +21,7 @@ export class StaffRepository {
         address: data.address,
         schoolId: data.schoolId,
         isAcademic: data.staffType === 'ACADEMIC' ? true : false,
+        roleId: data.roleId,
       },
     });
   }
@@ -30,6 +31,19 @@ export class StaffRepository {
       include: { role: true },
     });
   }
+
+  async findByID(id: string) {
+    return this.database.staff.findFirst({
+      where: { id },
+      omit: { password: true },
+      include: { role: true },
+    });
+  }
+
+  async getStaffRole() {
+    return await this.database.role.findFirst({ where: { name: 'staff' } });
+  }
+
   async updateAccount() {}
   async deactivateAccount() {}
 }

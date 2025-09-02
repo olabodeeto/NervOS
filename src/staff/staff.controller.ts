@@ -1,4 +1,12 @@
-import { Body, Controller, Post, UseGuards, Request } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  UseGuards,
+  Request,
+  Get,
+  Param,
+} from '@nestjs/common';
 import { CreateStaffDto } from './dto/school.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { StaffService } from './staff.service';
@@ -16,5 +24,10 @@ export class StaffController {
   @Post('login')
   async loginStaff(@Body() data: any) {
     return this.staffService.staffLogin(data);
+  }
+
+  @Get(':id')
+  async getStaff(@Param('id') id: string) {
+    return await this.staffService.getStaff(id);
   }
 }
