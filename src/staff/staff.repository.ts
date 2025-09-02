@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { ICreateStaff } from './staff.nterface';
+import { ICreateStaff, IUpdateStaff } from './staff.nterface';
 
 @Injectable()
 export class StaffRepository {
@@ -44,6 +44,20 @@ export class StaffRepository {
     return await this.database.role.findFirst({ where: { name: 'staff' } });
   }
 
-  async updateAccount() {}
+  async updateAccount(id: string, data: IUpdateStaff) {
+    return await this.database.staff.update({
+      where: {
+        id,
+      },
+      data: {
+        phone: data.phone,
+        address: data.address,
+        photo: data.photo,
+        staffType: data.staffType,
+      },
+      omit: { password: true },
+      include: { role: true },
+    });
+  }
   async deactivateAccount() {}
 }

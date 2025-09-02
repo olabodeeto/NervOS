@@ -13,3 +13,10 @@ export interface ICreateStaff {
   roleId: string;
   role: any;
 }
+
+export interface IUpdateStaff {
+  phone: string;
+  address: string;
+  photo: string;
+  staffType: string;
+}

@@ -8,7 +8,7 @@ import {
 import { BcryptService } from 'src/auth/bcrypt.service';
 import { UtilsService } from 'src/utils/utils.service';
 import { StaffRepository } from './staff.repository';
-import { ICreateStaff } from './staff.nterface';
+import { ICreateStaff, IUpdateStaff } from './staff.nterface';
 import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
@@ -73,5 +73,14 @@ export class StaffService {
     const staff = await this.repo.findByID(id);
     if (!staff) throw new BadRequestException('Staff not found!');
     return { ...staff };
+  }
+
+  //update staff
+  async update(id: string, data: IUpdateStaff) {
+    const staff = await this.repo.findByID(id);
+    if (!staff) throw new BadRequestException('Staff not found!');
+    const updated = await this.repo.updateAccount(id, data);
+    if (!updated) throw new BadRequestException('Oops!, action failed!');
+    return { ...updated };
   }
 }
