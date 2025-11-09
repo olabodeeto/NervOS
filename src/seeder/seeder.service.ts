@@ -17,37 +17,39 @@ export class SeederService {
       { name: 'Premium', duration: 12, price: 199.99 },
     ];
     const existingUser = await this.prisma.user.findFirst({
-      where: { email: 'super@classut.com' },
+      where: { email: 'super@thenervos.com' },
     });
 
     if (!existingUser) {
       const hashedPassword = await this.bcryptService.hash('test1234');
 
       const superRole = await this.prisma.role.upsert({
-        where: { name_schoolId: { name: 'superadmin', schoolId: 'classut' } },
+        where: { name_tenantId: { name: 'superadmin', tenantId: 'nervos' } },
         update: {},
         create: {
           name: 'superadmin',
-          schoolId: 'classut',
+          tenantId: 'nervos',
           permissions: JSON.stringify(['Global']),
         },
       });
 
-      await this.prisma.user.create({
-        data: {
-          name: 'Super Admin',
-          email: 'super@classut.com',
+      await this.prisma.user.upsert({
+        where: { email: 'super@thenervos.com' },
+        update: {}, // leave empty or add fields to update if already exists
+        create: {
+          email: 'super@thenervos.com',
+          name: 'Admin',
           password: hashedPassword,
           roleId: superRole.id,
         },
       });
 
       await this.prisma.role.upsert({
-        where: { name_schoolId: { name: 'admin', schoolId: 'classut' } },
+        where: { name_tenantId: { name: 'admin', tenantId: 'nervos' } },
         update: { permissions: JSON.stringify({ ...AllPermissions }) },
         create: {
           name: 'admin',
-          schoolId: 'classut',
+          tenantId: 'nervos',
           permissions: JSON.stringify({ ...AllPermissions }),
         },
       });

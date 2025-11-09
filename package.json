@@ -1,8 +1,8 @@
 {
-  "name": "classut-backend",
+  "name": "nervos",
   "version": "0.0.1",
   "description": "",
-  "author": "",
+  "author": "Olabode Eto",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {

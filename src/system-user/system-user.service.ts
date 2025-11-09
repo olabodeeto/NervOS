@@ -4,7 +4,6 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { RoleService } from 'src/role/role.service';
 import { CreateSystemUserDto } from './dto/user.dto';
 import { BcryptService } from 'src/auth/bcrypt.service';
 import { SystemUserRepository } from './system-user.repository';
@@ -13,26 +12,12 @@ import { JwtService } from '@nestjs/jwt';
 @Injectable()
 export class SystemUserService {
   constructor(
-    private roleService: RoleService,
     private bcryptService: BcryptService,
     private repo: SystemUserRepository,
     private readonly jwtService: JwtService,
   ) {}
 
-  createSystemUser = async (data: CreateSystemUserDto) => {
-    try {
-      const superrole = await this.roleService.findRoleWithName('superadmin');
-      const hashpassword = await this.bcryptService.hash(data.password);
-      data.password = hashpassword;
-      const payload = { ...data, roleId: superrole?.id! };
-      const user = await this.repo.create(payload);
-      return { ...user };
-    } catch (error) {
-      if (error && error.code === 'P2002') {
-        throw new BadRequestException('Credentials taken');
-      }
-    }
-  };
+  createSystemUser = async (data: CreateSystemUserDto) => {};
 
   validate = async (data: { email: string; password: string }) => {
     const user = await this.repo.findByEmail(data.email);

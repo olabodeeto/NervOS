@@ -1,72 +1,190 @@
-<!-- <p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p> -->
+# 🧠 NervOS — Vital E-Health Network Operating System
 
-## Introduction
-
-Classut (School Management System) is a comprehensive platform owned by Innovou, an organization that acts as a super-admin to onboard and manage multiple schools. The system is designed to streamline academic operations such as student enrollment, timetable management, e-library, performance tracking, resource sharing, and more.
-
-Built with Nest.js, TypeScript, and a scalable frontend architecture, this system ensures modularity, security, and maintainability. The goal is to provide a unified interface for schools to digitize and efficiently manage their academic and administrative workflows.
-
-This document outlines the coding conventions and best practices to ensure consistency, readability, and maintainability across the anchor-sms project.
+**NervOS** is a modular, enterprise-grade **E-Health Network Operating System** designed to connect hospitals, clinics, labs, pharmacies, and patients through a single interoperable digital platform. Built with **NestJS** and **PostgreSQL**, NervOS is designed for scalability, security, and standards-based interoperability (FHIR / HL7).
 
 ---
 
-## General Guidelines
+## 🚀 Vision
 
-1. **Project Naming**
-   - Use `snake_case` for all directory and `kebab-case` for file names.
-   - Keep names descriptive but concise.
+Healthcare systems across regions often operate in isolation — data is trapped, workflows are inefficient, and coordination between institutions is poor. **NervOS** bridges these gaps by providing a unified, secure, and standards-driven platform for all healthcare stakeholders.
 
-2. **Function Naming**
-   - Use `camelCase` for all function names.
-   - Functions should describe their purpose clearly.
-
-3. **Variable Naming**
-   - Use `camelCase` for variables.
-   - Constants should be in `UPPER_CASE`.
-
-4. **Component Naming**
-   - Use `PascalCase` for React components.
-   - Each component should reside in its own file.
-
-5. **Styling**
-   - Use CSS modules or styled-components with consistent naming conventions.
-   - File names for styles should match their associated component or page.
-
-6. **Imports**
-   - Group imports logically: external libraries first, followed by internal imports.
-   - Use absolute imports where applicable.
-
-7. **File Structure**
-   - Group related functionalities into directories.
-   - Avoid deeply nested structures unless necessary.
+> _"Connecting Care, Empowering Health."_
 
 ---
 
+## 🏗️ Architecture Overview
+
+NervOS is built as a **modular monolith** for the MVP phase — allowing rapid development and easy migration into microservices in future versions. A dedicated **Integration Layer** (FHIR / HL7) ensures the system can exchange clinical data with external systems using healthcare standards.
+
+```
+nervos/
+ ├── src/
+ │   ├── main.ts
+ │   ├── app.module.ts
+ │   ├── config/
+ │   ├── common/
+ │   ├── modules/
+ │   │   ├── auth/
+ │   │   ├── patient/
+ │   │   ├── staff/
+ │   │   ├── appointment/
+ │   │   ├── billing/
+ │   │   ├── pharmacy/
+ │   │   ├── lab/
+ │   │   └── integration/        # FHIR adapter, HL7 bridge, connectors
+ │   └── database/
+ ├── .env
+ ├── Dockerfile
+ ├── docker-compose.yml
+ ├── package.json
+ └── README.md
+```
+
 ---
 
-## Code Style
+## 🔗 Standards & Interoperability (FHIR / HL7)
 
-1. **Indentation**: Use 2 spaces for indentation.
-2. **Quotes**: Use single quotes for strings, except where double quotes are necessary.
-3. **Semicolons**: Always use semicolons.
-4. **Line Length**: Limit lines to 80 characters where possible.
-5. **Commenting**:
-   - Use `//` for inline comments.
-   - Use `/** */` for documentation-style comments.
-6. **Testing**:
-   - Write unit tests for components and utility functions.
-   - Place test files alongside the code they test, with the `.test.tsx` or `.test.ts` suffix.
+Interoperability is central to NervOS. The project includes a dedicated `integration` module that implements:
+
+- **FHIR REST API adapter** — expose and consume FHIR resources (Patient, Encounter, Observation, MedicationRequest, DiagnosticReport, etc.)
+- **HL7 v2 inbound/outbound bridge** — translate HL7 v2 messages (ADTs, ORUs, OBR/OBXs) to internal models or FHIR where possible
+- **Terminology & Mapping** — map local codes to standard terminologies (LOINC, SNOMED CT, ICD-10)
+- **Security & Audit** — ensure secure data exchange (JWT, mutual TLS where needed) and audit logging for exchanged clinical messages
+- **Message queue / ETL** — support async integration using message brokers (RabbitMQ, Kafka) for resilience and batching
+
+This design lets NervOS operate as both a _FHIR-capable server_ and a _translator/gateway_ for legacy systems that still use HL7 v2.
+
+### Typical Integration Flows
+
+1. **Patient Registration (from external EHR):**
+   - External system posts FHIR `Patient` to NervOS FHIR endpoint.
+   - Integration adapter validates and maps resource, creates/updates local patient record, and returns FHIR `OperationOutcome`.
+
+2. **Lab Result (HL7 v2 → NervOS):**
+   - Lab instrument or LIS sends HL7 ORU^R01
+   - HL7 bridge parses ORU, maps observation codes to LOINC, persists the result and emits a FHIR `DiagnosticReport` internally for downstream consumers.
+
+3. **Order Sync (NervOS → External System):**
+   - NervOS creates a MedicationRequest or ServiceRequest and the FHIR adapter posts it to a partner FHIR server or translates to an HL7 v2 ORM message for legacy systems.
 
 ---
 
-## Commit Messages
+## ⚙️ Core Technologies
 
-- Follow the format: `<type>: (<scope>)<description>`
-- Example: `feat: (auth)add login functionality`
-- Types include: `feat`, `fix`, `chore`, `refactor`, `test`, `docs`.
+| Tool                                            | Purpose                     |
+| ----------------------------------------------- | --------------------------- |
+| [NestJS](https://nestjs.com/)                   | Backend framework           |
+| [Prisma](https://www.prisma.io/)                | ORM for PostgreSQL          |
+| [PostgreSQL](https://www.postgresql.org/)       | Primary database            |
+| [Swagger](https://swagger.io/)                  | API documentation           |
+| [Passport.js + JWT](http://www.passportjs.org/) | Authentication              |
+| [Docker](https://www.docker.com/)               | Containerization            |
+| [FHIR / HL7 Standards](https://hl7.org/fhir/)   | Healthcare interoperability |
 
 ---
 
-By following these conventions, we aim to create a clean and scalable codebase for Koresmart. Adhering to these standards will facilitate collaboration, reduce technical debt, and ensure the success of the project.
+## 🧩 Modules (MVP Phase)
+
+| Module          | Description                                                   |
+| --------------- | ------------------------------------------------------------- |
+| **Auth**        | User login, signup, and role-based access (JWT)               |
+| **Patient**     | Patient registration, demographics, and EHR                   |
+| **Staff**       | Doctors, nurses, and administrative staff                     |
+| **Appointment** | Scheduling and availability management                        |
+| **Billing**     | Invoicing and payment tracking                                |
+| **Pharmacy**    | Drug catalog, inventory, and prescriptions                    |
+| **Lab**         | Test orders, results, and lab workflows                       |
+| **Integration** | **FHIR adapter, HL7 bridge, connectors, terminology mapping** |
+| **Admin**       | Access control, organization management, and system settings  |
+
+---
+
+## 🧰 Getting Started
+
+### 1️⃣ Clone the Repository
+
+```bash
+git clone https://github.com/<your-username>/nervos.git
+cd nervos
+```
+
+### 2️⃣ Install Dependencies
+
+```bash
+npm install
+```
+
+### 3️⃣ Environment Setup
+
+Create a `.env` file in the project root. For integration features you may need extra vars (example below):
+
+```env
+DATABASE_URL=postgresql://user:password@localhost:5432/nervos
+JWT_SECRET=your_jwt_secret
+PORT=4000
+# Integration specific
+FHIR_ENABLED=true
+FHIR_BASE_URL=http://localhost:4000/fhir
+HL7_BRIDGE_ENABLED=true
+HL7_LISTEN_PORT=2575
+TERMINOLOGY_SERVER_URL=http://terminology-server:8080
+```
+
+### 4️⃣ Run the Application
+
+```bash
+npm run start:dev
+```
+
+Open:
+
+- **API & Swagger:** `http://localhost:4000/api/docs`
+- **FHIR base (if enabled):** `http://localhost:4000/fhir` (FHIR endpoints)
+
+---
+
+## 🧱 Development Guidelines
+
+- Follow NestJS module architecture.
+- Use **DTOs** and **class-validator** for all inputs.
+- Keep business logic inside services, not controllers.
+- Put FHIR/HL7 parsing and mapping logic inside the `integration` module and keep it decoupled from domain services via well-defined events or interfaces.
+- Use environment variables for all configs.
+
+---
+
+## 🌍 Future Roadmap
+
+- [ ] Harden FHIR server compliance (profiles, conformance, CapabilityStatement)
+- [ ] Implement terminology service integration (SNOMED/LOINC lookups)
+- [ ] Build HL7 v2 ACK handling & message persistence
+- [ ] Expand to multi-tenant, multi-hospital networks
+- [ ] Analytics & clinical dashboards
+- [ ] Mobile & Web clients
+
+---
+
+## 🤝 Contributing
+
+We welcome contributors! To contribute:
+
+1. Fork the repo
+2. Create a new branch (`feature/your-feature-name`)
+3. Commit changes and open a pull request
+
+If you plan to work on integration features, open an issue describing which standard/resource you’ll implement (e.g., FHIR Patient CRUD, DiagnosticReport ingestion from HL7).
+
+---
+
+## 🧾 License
+
+This project is licensed under the **MIT License** — feel free to use and improve.
+
+---
+
+## 💡 Maintained by
+
+**Olabode Eto** — Founder of _boddlabs_
+Building digital ecosystems that transform industries.
+
+> 💬 _For collaboration or partnership inquiries, reach out via GitHub Discussions or Telegram._
